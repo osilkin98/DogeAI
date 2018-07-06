@@ -100,7 +100,7 @@ def doge_convolution(features, labels, mode):
 
 
     predictions = {
-        "classes": tf.argmax(input=logits, axis=1)
+        "classes": tf.argmax(input=logits, axis=1),
         "probabilities": tf.nn.softmax(logits, name="softmax_tensor")
     }
     if mode == tf.estimator.ModeKeys.PREDICT:
