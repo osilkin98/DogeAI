@@ -25,39 +25,78 @@ init_op = tf.global_variables_initializer()
 
 def doge_convolution(features, labels, mode):
     # first input layer
-    input_layer = tf.reshape(features["x"], [-1, 100, 100, 3])
+    input_layer = tf.reshape(features["x"], [-1, 96, 96, 3])
 
-
-    # second input layer
+    # first convolutionary layer: 96x96x32 = 294,912
     convolutionary_layer_1 = tf.layers.conv2d(
         inputs=input_layer,
-        filters=12,
-        kernel_size=[30, 30],
+        filters=32,
+        kernel_size=[5, 5],
         padding="same",
         activation=tf.nn.relu
     )
-
+    # reduces 96x96x32 -> 48x48x32
     pooling_layer_1 = tf.layers.max_pooling2d(
         inputs=convolutionary_layer_1,
         pool_size=[2, 2],
         strides=2
     )
-
+    # second convolutional layer: 48x48x64 = 147,456
     convolutionary_layer_2 = tf.layers.conv2d(
         inputs=pooling_layer_1,
-        filters=24,
-        kernel_size=[30, 30],
+        filters=64,
+        kernel_size=[5, 5],
         padding="same",
         activation=tf.nn.relu
     )
 
-    pooling_layer_2 = tf.layers.average_pooling2d(
+    # second pooling layer: 48x48x64 -> 24x24x64
+    pooling_layer_2 = tf.layers.max_pooling2d(
         inputs=convolutionary_layer_2,
         pool_size=[2, 2],
         strides=2
     )
 
+    # third convolutional layer: 24x24x128 = 73,720
+    convolutionary_layer_3 = tf.layers.conv2d(
+        inputs=pooling_layer_2,
+        filters=128,
+        kernel_size=5,
+        padding="same",
+        activation=tf.nn.relu
+    )
 
+    # third pooling layer: 24x24x128 -> 12x12x128
+    pooling_layer_3 = tf.layers.max_pooling2d(
+        inputs=convolutionary_layer_3,
+        pool_size=[2, 2],
+        strides=2
+    )
+
+    # fourth convolutional layer: 12x12x256 = 36,864
+    convolutionary_layer_4 = tf.layers.conv2d(
+        inputs=pooling_layer_3,
+        filters=256,
+        kernel_size=5,
+        padding="same",
+        activation=tf.nn.relu
+    )
+
+    # fourth pooling layer: 12x12x256 -> 6x6x256
+    pooling_layer_4 = tf.layers.max_pooling2d(
+        inputs=convolutionary_layer_4,
+        pool_size=[2, 2],
+        strides=2
+    )
+
+    flatten_pooling_layer_2 = tf.reshape(pooling_layer_2, [-1, 6 * 6 * 256])
+
+    dense = tf.layers.dense(inputs=flatten_pooling_layer_2, units=2048, activation=tf.nn.relu)
+
+    dropout = tf.layers.dropout(inputs=dense, training=mode == tf.estimator.ModeKeys.TRAIN)
+
+    # possible outcomes: doge or not doge
+    logits = tf.layers.dense(inputs=dropout, units=2)
 
 '''
 with tf.Session() as sess:
