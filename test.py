@@ -98,6 +98,15 @@ def doge_convolution(features, labels, mode):
     # possible outcomes: doge or not doge
     logits = tf.layers.dense(inputs=dropout, units=2)
 
+
+    predictions = {
+        "classes": tf.argmax(input=logits, axis=1)
+        "probabilities": tf.nn.softmax(logits, name="softmax_tensor")
+    }
+    if mode == tf.estimator.ModeKeys.PREDICT:
+        return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
+
+
 '''
 with tf.Session() as sess:
     sess.run(init_op)
