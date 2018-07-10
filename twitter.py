@@ -22,7 +22,7 @@ def get_image_from_tweet(target_tweet):
             return image_object
 
 
-def display_image(target_tweet, delete_image=True):
+def display_image_from_tweet(target_tweet, delete_image=True):
     if 'media' in target_tweet.entities:
         for image in target_tweet.entities['media']:
             print(image['media_url'])
@@ -42,7 +42,7 @@ try:
 
     # retrieve the first post from timeline
     first_tweet = api.home_timeline()[0]
-    display_image(first_tweet)
+    display_image_from_tweet(first_tweet)
 
 except tweepy.TweepError as e:
     print(e.message)
