@@ -19,15 +19,12 @@ class TempImage(object):
             self.image = Image.open(self.relative_path)
         except Exception as wget_exception: # this would likely happen in the case of a 40* error
             print(wget_exception.message)
-        finally:
             if os.path.exists(self.relative_path):
                 os.remove(self.relative_path)
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        os.remove(self.relative_path)
-
     def __del__(self):
-        os.remove(self.relative_path)
+        if os.path.exists(self.relative_path):
+            os.remove(self.relative_path)
 
     def display(self):
         self.image.show() # runs temp_image's show method
