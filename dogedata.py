@@ -34,6 +34,12 @@ def create_dataset(directory1, directory2, training=True):
     dir1_size, dir2_size = len(dir1), len(dir2)
     print("{} size: {}\n{} size: {}\nTotal: {}".format(directory1, dir1_size, directory2, dir2_size, dir1_size+dir2_size))
 
+    dir1_chance = dir1_size / (dir1_size + dir2_size)
+    print("Chance to pick item from {}: {}\nChance to pick item from {}: {}".format(
+        directory1, dir1_chance,
+        directory2, 1 - dir1_chance
+        )
+    )
 
 
 create_dataset('/home/oleg/Pictures/classification_data/doge/', '/home/oleg/Pictures/classification_data/not-doge/')
