@@ -123,8 +123,10 @@ def main(unused_argv):
     eval_data = mnist.test.images  # Returns np.array
     eval_labels = np.asarray(mnist.test.labels, dtype=np.int32)
 
-    print(train_data)
-    print(eval_data)
+    print("Training Data Type: {}".format(type(train_data)))
+    # for i in range(len(train_data)):
+    #    print(train_data[i])
+    # print(eval_data)
     '''
     
         # Create the Estimator
