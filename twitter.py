@@ -23,6 +23,10 @@ def display_image_from_tweet(target_tweet):
     my_image.image.show()
 
 
+class MyStreamListener(tweepy.StreamListener):
+    def on_status(self, status):
+        print(status.text)
+
 try:
     api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
