@@ -1,7 +1,6 @@
 from PIL import Image
 import os
 import wget
-
 # Should be a class for a temporary image obtained from a URL
 # Which is downloaded in the tmp/ directory and deleted once it's no longer in reference.
 # This is really just a wrapper for the PIL.Image class
@@ -18,7 +17,7 @@ class TempImage(object):
             wget.download(self.url, self.relative_path)
             self.image = Image.open(self.relative_path)
         except Exception as wget_exception: # this would likely happen in the case of a 40* error
-            print(wget_exception.message)
+            print(wget_exception)
             if os.path.exists(self.relative_path):
                 os.remove(self.relative_path)
 
