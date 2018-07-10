@@ -9,7 +9,7 @@ import wget
 temp_directory = 'tmp/'
 
 
-class temp_image:
+class TempImage(object):
     # Default constructor
     def __init__(self, outside_url=None):
         try:
@@ -28,3 +28,6 @@ class temp_image:
 
     def __del__(self):
         os.remove(self.relative_path)
+
+    def display(self):
+        self.image.show() # runs temp_image's show method
