@@ -23,7 +23,6 @@ def display_image_from_tweet(target_tweet):
     my_image.image.show()
 
 
-
 try:
     api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
@@ -37,24 +36,3 @@ except tweepy.TweepError as e:
     print(e.message)
 finally:
     print("Program Finished Execution")
-
-'''
-if 'media' in target_tweet.entities:
-    for image in target_tweet.entities['media']:
-        
-# print(target_tweet.entities)
-# api.update_status("{} is deployed and ready for action".format(user.name))
-
-'''
-'''
-    # print(json.dumps(target_tweet.entities, sort_keys=True, indent=2, separators=(',', ': ')))
-    if 'media' in target_tweet.entities:
-        for image in target_tweet.entities['media']:
-            print(image['media_url'])
-            # all the images from media are guaranteed to be .jpg
-            image_dir = 'tmp/image{}.jpg'.format(len(os.listdir('tmp/')) + 1)
-            wget.download(image['media_url'], image_dir)
-            viewable = Image.open(image_dir)
-            viewable.show()
-            os.remove(image_dir)
-'''
