@@ -2,6 +2,7 @@ import cv2
 import os
 import numpy as np
 
+
 # Takes a directory
 def prepare_data_from_directory(directory):
     if directory[-1] != '/':
@@ -23,5 +24,18 @@ def prepare_data_from_directory(directory):
         return np.array(to_fill)
 
 
-numpy_array = prepare_data_from_directory('/home/oleg/Pictures/classification_data/doge/')
-print(numpy_array.shape)
+# we should create a dataset of 385 doge images
+def create_dataset(directory1, directory2, training=True):
+    """This creates a dataset and returns a 4-D numpy array of imagesand a 1-D array of their respective labels,
+        respectively.the training data to all data size should be 6/7 or ~85.71%, with the other test data
+        comprising 14.29% of the total data size, or 1/7 to test the CNN"""
+
+    dir1, dir2 = os.listdir(directory1), os.listdir(directory2)
+    dir1_size, dir2_size = len(dir1), len(dir2)
+    print("{} size: {}\n{} size: {}\nTotal: {}".format(directory1, dir1_size, directory2, dir2_size, dir1_size+dir2_size))
+
+
+
+create_dataset('/home/oleg/Pictures/classification_data/doge/', '/home/oleg/Pictures/classification_data/not-doge/')
+# numpy_array = prepare_data_from_directory('/home/oleg/Pictures/classification_data/doge/')
+# print(numpy_array.shape)
