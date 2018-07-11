@@ -7,9 +7,10 @@ import numpy as np
 def prepare_data_from_directory(directory):
     if directory[-1] != '/':
         raise Exception("Invalid Directory")
+
+    to_fill = []
     try:
         directory_listing = os.listdir(directory)
-        to_fill = []
         for x in directory_listing:
             # Appends a cv2 interpretation of a JPG image
             # CV2 representation is in a native numpy array type with dtype=uint8
@@ -25,21 +26,13 @@ def prepare_data_from_directory(directory):
 
 
 # we should create a dataset of 385 doge images
-def create_dataset(directory1, directory2, training=True):
+def create_dataset(directory1, directory2):
     """This creates a dataset and returns a 4-D numpy array of imagesand a 1-D array of their respective labels,
         respectively.the training data to all data size should be 6/7 or ~85.71%, with the other test data
         comprising 14.29% of the total data size, or 1/7 to test the CNN"""
-
     dir1, dir2 = os.listdir(directory1), os.listdir(directory2)
-    dir1_size, dir2_size = len(dir1), len(dir2)
-    print("{} size: {}\n{} size: {}\nTotal: {}".format(directory1, dir1_size, directory2, dir2_size, dir1_size+dir2_size))
 
-    dir1_chance = dir1_size / (dir1_size + dir2_size)
-    print("Chance to pick item from {}: {}\nChance to pick item from {}: {}".format(
-        directory1, dir1_chance,
-        directory2, 1 - dir1_chance
-        )
-    )
+
 
 
 create_dataset('/home/oleg/Pictures/classification_data/doge/', '/home/oleg/Pictures/classification_data/not-doge/')
