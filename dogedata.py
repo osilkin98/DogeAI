@@ -1,7 +1,7 @@
 import cv2
 import os
 import numpy as np
-
+import random
 
 # Takes a directory
 def prepare_data_from_directory(directory):
@@ -25,16 +25,49 @@ def prepare_data_from_directory(directory):
         return np.array(to_fill)
 
 
-# we should create a dataset of 385 doge images
+# This Function should accept parameters as directory listings that end in '/'
 def create_dataset(directory1, directory2):
     """This creates a dataset and returns a 4-D numpy array of imagesand a 1-D array of their respective labels,
         respectively.the training data to all data size should be 6/7 or ~85.71%, with the other test data
         comprising 14.29% of the total data size, or 1/7 to test the CNN"""
-    dir1, dir2 = os.listdir(directory1), os.listdir(directory2)
+
+    if directory1[-1] != '/' or directory2[-1] != '/':
+        raise Exception("Invalid Directory Arguments")
+
+    # For the labels, 1 == doge, 0 == not doge
+    img_array, labels = [], []
+
+    try:
+        # since os.listdir() returns a listing of all the files but not the absolute path, for reading the
+        # images in with cv2 we'll have to simply appened the directory name
+        dir1, dir2 = os.listdir(directory1), os.listdir(directory2)
+        files = [dir1, dir2]
+        total_size = len(files[0]) + len(files[1])
+        # Move all the files from the directory listing into cv2 arrays, and then remove them from the program's memory
+        while total_size > 0:
+            # use p <= doge_size / total_size for a discrete random variable p to ensure a rolling even spread of 50/50
+            if len(files[1]) == 0 or (random.random() <= float(len(files[0])) / total_size and len(files[0]) != 0):
+                random_doge = files[0][random.randint(0, len(files[0]) - 1)]
+                img_array.append(cv2.imread("{}{}".format(directory1, random_doge)))
+                labels.append(1)
+                files[0].remove(random_doge)
+            else:
+                random_notdoge = files[1][random.randint(0, len(files[1]) - 1)]
+                img_array.append(cv2.imread("{}{}".format(directory2, random_notdoge)))
+                labels.append(0)
+                files[1].remove(random_notdoge)
+            total_size -= 1
+    except FileNotFoundError as fnf:
+        print("[prepare_data_from_directory]: {} could not be found".format(fnf.filename))
+    except NotADirectoryError as ndr:
+        print("[prepare_data_from_directory]: invalid directory: {}".format(ndr.filename))
+    except IsADirectoryError as idr:
+        print("[prepare_data_from_directory]: is a directory, not file: {}".format(idr.filename))
+    except Exception as e:
+        print(e)
+    finally:
+        return np.array(img_array), np.array(labels)
 
 
-
-
-create_dataset('/home/oleg/Pictures/classification_data/doge/', '/home/oleg/Pictures/classification_data/not-doge/')
-# numpy_array = prepare_data_from_directory('/home/oleg/Pictures/classification_data/doge/')
-# print(numpy_array.shape)
+images, labels = create_dataset('/home/oleg/Pictures/classification_data/training/doge/',
+                                '/home/oleg/Pictures/classification_data/training/not-doge/')
