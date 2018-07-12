@@ -3,7 +3,7 @@ import keys
 import tweepy
 from image_file import TempImage
 import tensorflow as tf
-
+import doge_classifier as dc
 
 # set the keys in the authorization
 auth = tweepy.OAuthHandler(keys.consumer_key, keys.consumer_secret)
@@ -19,7 +19,7 @@ def get_image_from_tweet(target_tweet):
 
 
 def test(image):
-    classifier = tf.estimator.Estimator(model_fn=doge_convolution, model_dir='trained_doge/')
+    classifier = tf.estimator.Estimator(model_fn=dc.doge_convolution, model_dir='trained_doge/')
 
     test_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": image},
