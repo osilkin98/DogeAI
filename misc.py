@@ -22,7 +22,7 @@ import tensorflow as tf
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
-'''
+
 def cnn_model_fn(features, labels, mode):
     """Model function for CNN."""
     # Input Layer
@@ -79,7 +79,7 @@ def cnn_model_fn(features, labels, mode):
 
     # Add dropout operation; 0.6 probability that element will be kept
     dropout = tf.layers.dropout(
-        inputs=dense, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+        inputs=dense, rate=0.1, training=mode == tf.estimator.ModeKeys.TRAIN)
 
     # Logits layer
     # Input Tensor Shape: [batch_size, 1024]
@@ -113,7 +113,7 @@ def cnn_model_fn(features, labels, mode):
             labels=labels, predictions=predictions["classes"])}
     return tf.estimator.EstimatorSpec(
         mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
-'''
+
 
 def main(unused_argv):
     # Load training and eval data
@@ -122,12 +122,14 @@ def main(unused_argv):
     train_labels = np.asarray(mnist.train.labels, dtype=np.int32)
     eval_data = mnist.test.images  # Returns np.array
     eval_labels = np.asarray(mnist.test.labels, dtype=np.int32)
-
-    print("Training Data Type: {}".format(type(train_data)))
+    print("Label Data Type: {}\nTraining Label Shape: {}".format(type(train_labels),
+                                                                 train_labels.shape))
+    print("Training Data Type: {}".format(train_data.dtype))
+    print("Training Labels: {}".format(train_labels))
     # for i in range(len(train_data)):
     #    print(train_data[i])
     # print(eval_data)
-    '''
+
     
         # Create the Estimator
     mnist_classifier = tf.estimator.Estimator(
@@ -159,7 +161,6 @@ def main(unused_argv):
         shuffle=False)
     eval_results = mnist_classifier.evaluate(input_fn=eval_input_fn)
     print(eval_results)
-    '''
 
 
 if __name__ == "__main__":
