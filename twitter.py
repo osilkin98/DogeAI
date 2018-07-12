@@ -41,11 +41,11 @@ def doge_or_not_doge(target_tweet):
     print("tweet id: {}".format(target_tweet.id))
     if identify_doge(image.get_numpy()) == 1:
         print("doge")
-        api.update_status("doge", in_reply_to_status_id=target_tweet.id)
+        api.update_status("@{} doge".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
     # Image was Not Doge
     else:
         print("not doge")
-        api.update_status("doge", in_reply_to_status_id=target_tweet.id)
+        api.update_status("@{} not doge".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
 
 
 def display_image_from_tweet(target_tweet):
