@@ -66,5 +66,5 @@ def create_dataset(directory1, directory2):
     except Exception as e:
         print(e)
     finally:
-        return np.array(img_array, dtype=np.int32), np.array(labels, dtype=np.int32)
+        return np.array(img_array, dtype=np.float32), np.array(labels, dtype=np.int32)
 
