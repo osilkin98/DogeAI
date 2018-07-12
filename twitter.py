@@ -49,7 +49,10 @@ def doge_or_not_doge(target_tweet):
     # Image was Not Doge
     else:
         print("not doge")
-        api.update_status("@{} not doge".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
+        api.update_status("@{} not doge\n\n(Probability of doge: {})".format(
+            target_tweet.user.screen_name,
+            doger['probabilities'][0]
+        ), in_reply_to_status_id=target_tweet.id)
 
 
 def display_image_from_tweet(target_tweet):
