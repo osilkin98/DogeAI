@@ -48,20 +48,40 @@ def create_dataset(directory1, directory2):
             # use p <= doge_size / total_size for a discrete random variable p to ensure a rolling even spread of 50/50
             if len(files[1]) == 0 or (random.random() <= float(len(files[0])) / total_size and len(files[0]) != 0):
                 random_doge = files[0][random.randint(0, len(files[0]) - 1)]
-                doge_image = cv2.imread("{}{}".format(directory1, random_doge))
-                if doge_image.shape[0] != 96 or doge_image.shape[1] != 96:
-                    doge_image = cv2.resize(doge_image, (96, 96))
-                img_array.append(np.true_divide(doge_image.astype(np.float32), 255))
-                labels.append(1)
-                files[0].remove(random_doge)
+                # if the file selected is a jpeg
+                if (random_doge[len(random_doge)-4:len(random_doge)].lower() == ".jpg") or \
+                        (random_doge[len(random_doge)-5:len(random_doge)].lower() == ".jpeg"):
+                    # Read the image in with cv2
+                    doge_image = cv2.imread("{}{}".format(directory1, random_doge))
+                    # Reshape the image
+                    if doge_image.shape[0] != 96 or doge_image.shape[1] != 96:
+                        doge_image = cv2.resize(doge_image, (96, 96))
+
+                    # Format the image type and append it to the array
+                    img_array.append(np.true_divide(doge_image.astype(np.float32), 255))
+                    labels.append(1) # append the doge label
+                    files[0].remove(random_doge)
+                # if the files are unrecognized
+                else:
+                    files[0].remove(random_doge)
+                    total_size -= 1
+                    continue
+            # otherwise we're looking at non-doge files
             else:
                 random_notdoge = files[1][random.randint(0, len(files[1]) - 1)]
-                random_image = cv2.imread("{}{}".format(directory2, random_notdoge))
-                if random_image.shape[0] != 96 or random_image.shape[1] != 96:
-                    random_image = cv2.resize(random_image, (96, 96))
-                img_array.append(np.true_divide(random_image.astype(np.float32), 255))
-                labels.append(0)
-                files[1].remove(random_notdoge)
+                if (random_notdoge[len(random_notdoge)-4:len(random_notdoge)].lower() == ".jpg") or \
+                    (random_notdoge[len(random_notdoge)-5:len(random_notdoge)].lower() == ".jpeg"):
+                    random_image = cv2.imread("{}{}".format(directory2, random_notdoge))
+                    if random_image.shape[0] != 96 or random_image.shape[1] != 96:
+                        random_image = cv2.resize(random_image, (96, 96))
+                    img_array.append(np.true_divide(random_image.astype(np.float32), 255))
+                    labels.append(0)
+                    files[1].remove(random_notdoge)
+                # if the files are not recognized then we just continue
+                else:
+                    files[1].remove(random_notdoge)
+                    total_size -= 1
+                    continue
             total_size -= 1
     except FileNotFoundError as fnf:
         print("[prepare_data_from_directory]: {} could not be found".format(fnf.filename))
