@@ -142,7 +142,6 @@ def main(unused_argv):
     print(eval_results)
 
 
-'''
+
 if __name__ == "__main__":
   tf.app.run()
-'''
