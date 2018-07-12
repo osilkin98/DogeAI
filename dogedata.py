@@ -48,13 +48,18 @@ def create_dataset(directory1, directory2):
             # use p <= doge_size / total_size for a discrete random variable p to ensure a rolling even spread of 50/50
             if len(files[1]) == 0 or (random.random() <= float(len(files[0])) / total_size and len(files[0]) != 0):
                 random_doge = files[0][random.randint(0, len(files[0]) - 1)]
-                img_array.append(np.true_divide(
-                        cv2.imread("{}{}".format(directory1, random_doge)).astype(np.float32), 255))
+                doge_image = cv2.imread("{}{}".format(directory1, random_doge))
+                if doge_image.shape[0] != 96 or doge_image.shape[1] != 96:
+                    doge_image = cv2.resize(doge_image, (96, 96))
+                img_array.append(np.true_divide(doge_image.astype(np.float32), 255))
                 labels.append(1)
                 files[0].remove(random_doge)
             else:
                 random_notdoge = files[1][random.randint(0, len(files[1]) - 1)]
-                img_array.append(cv2.imread("{}{}".format(directory2, random_notdoge)))
+                random_image = cv2.imread("{}{}".format(directory2, random_notdoge))
+                if random_image.shape[0] != 96 or random_image.shape[1] != 96:
+                    random_image = cv2.resize(random_image, (96, 96))
+                img_array.append(np.true_divide(random_image.astype(np.float32), 255))
                 labels.append(0)
                 files[1].remove(random_notdoge)
             total_size -= 1
