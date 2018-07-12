@@ -1,135 +1,143 @@
 import tensorflow as tf
 import numpy as np
-from PIL import Image
-import dircache
+import dogedata
 
-directory = '/home/oleg/Pictures/doge-jpeg-jpg/'
-old_file_list = dircache.opendir(directory)
-file_list = []
-for filename in old_file_list:
-    file_list.append(directory + filename)
-
-print(file_list)
-
-
-print("Using TensorFlow version {}".format(tf.VERSION))
-
-filename_queue = tf.train.string_input_producer(file_list) #  list of files to read
-
-reader = tf.WholeFileReader()
-key, value = reader.read(filename_queue)
-
-my_img = tf.image.decode_jpeg(value) # use png or jpg decoder based on your files.
-
-init_op = tf.global_variables_initializer()
 
 def doge_convolution(features, labels, mode):
     # first input layer
     input_layer = tf.reshape(features["x"], [-1, 96, 96, 3])
 
-    # first convolutionary layer: 96x96x32 = 294,912
+    # first convolutionary layer: 96x96x12 = 110592
     convolutionary_layer_1 = tf.layers.conv2d(
         inputs=input_layer,
-        filters=32,
+        filters=12,
         kernel_size=[5, 5],
         padding="same",
         activation=tf.nn.relu
     )
-    # reduces 96x96x32 -> 48x48x32
+    # reduces 96x96x12 -> 48x48x12 # conversion rate = 2
     pooling_layer_1 = tf.layers.max_pooling2d(
         inputs=convolutionary_layer_1,
         pool_size=[2, 2],
         strides=2
     )
-    # second convolutional layer: 48x48x64 = 147,456
+    # second convolutional layer: 48x48x24 = 55,296
     convolutionary_layer_2 = tf.layers.conv2d(
         inputs=pooling_layer_1,
-        filters=64,
+        filters=24,
         kernel_size=[5, 5],
         padding="same",
         activation=tf.nn.relu
     )
 
-    # second pooling layer: 48x48x64 -> 24x24x64
+    # second pooling layer: 48x48x24 -> 24x24x24 # conversion rate = 4
     pooling_layer_2 = tf.layers.max_pooling2d(
         inputs=convolutionary_layer_2,
         pool_size=[2, 2],
         strides=2
     )
 
-    # third convolutional layer: 24x24x128 = 73,720
+    # third convolutional layer: 24x24x24 = 13,824
     convolutionary_layer_3 = tf.layers.conv2d(
         inputs=pooling_layer_2,
-        filters=128,
+        filters=24,
         kernel_size=5,
         padding="same",
         activation=tf.nn.relu
     )
 
-    # third pooling layer: 24x24x128 -> 12x12x128
+    # third pooling layer: 24x24x24 -> 12x12x48 # conversion rate = 2
     pooling_layer_3 = tf.layers.max_pooling2d(
         inputs=convolutionary_layer_3,
         pool_size=[2, 2],
         strides=2
     )
 
-    # fourth convolutional layer: 12x12x256 = 36,864
+    # fourth convolutional layer: 12x12x48 = 3,456
     convolutionary_layer_4 = tf.layers.conv2d(
         inputs=pooling_layer_3,
-        filters=256,
+        filters=48,
         kernel_size=5,
         padding="same",
         activation=tf.nn.relu
     )
 
-    # fourth pooling layer: 12x12x256 -> 6x6x256
+    # fourth pooling layer: 12x12x48 -> 6x6x48
     pooling_layer_4 = tf.layers.max_pooling2d(
         inputs=convolutionary_layer_4,
         pool_size=[2, 2],
         strides=2
     )
+    # single layer with 1,728 neurons
+    flatten_pooling_layer_2 = tf.reshape(pooling_layer_2, [-1, 6 * 6 * 48])
 
-    flatten_pooling_layer_2 = tf.reshape(pooling_layer_2, [-1, 6 * 6 * 256])
+    dense = tf.layers.dense(inputs=flatten_pooling_layer_2, units=1024, activation=tf.nn.relu)
 
-    dense = tf.layers.dense(inputs=flatten_pooling_layer_2, units=2048, activation=tf.nn.relu)
-
-    dropout = tf.layers.dropout(inputs=dense, training=mode == tf.estimator.ModeKeys.TRAIN)
+    dropout = tf.layers.dropout(inputs=dense, rate=0.1, training=mode == tf.estimator.ModeKeys.TRAIN)
 
     # possible outcomes: doge or not doge
     logits = tf.layers.dense(inputs=dropout, units=2)
 
-
+    tf
     predictions = {
         "classes": tf.argmax(input=logits, axis=1),
-        "probabilities": tf.nn.softmax(logits, name="softmax_tensor")
+        "probabilities": tf.nn.sigmoid(logits, name="sigmoid_tensor")
     }
+
     if mode == tf.estimator.ModeKeys.PREDICT:
         return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
 
+    # Calculate loss for training and evaluation modes
+    loss = tf.losses.sigmoid_cross_entropy(labels=labels, logits=logits)
 
-'''
-with tf.Session() as sess:
-    sess.run(init_op)
+    if mode == tf.estimator.ModeKeys.TRAIN:
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.075)
+        train_op = optimizer.minimize(loss=loss,
+                                      global_step=tf.train.get_global_step())
+        return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 
-    # Start populating the filename queue.
+    eval_ops_metrics = {
+        "accuracy": tf.metrics.accuracy(labels=labels, predictions=predictions["classes"])
+    }
 
-    coord = tf.train.Coordinator()
-    threads = tf.train.start_queue_runners(coord=coord)
-    f = 0
-    for i in range(len(file_list)): #length of your filename list
-        try:
-            image = my_img.eval() #here is your image Tensor :)
-            f += 1
-        except Exception as e:
-            print(e.message)
-            print("exception raised with file {} at index: {}".format(file_list[i], str(i)))
-        finally:
-            pass
+    return tf.estimator.EstimatorSpec(mode=mode, loss=loss, eval_metric_ops=eval_ops_metrics)
 
-    print("i = {}, f = {}".format(i, f))
-    print(image.shape)
-    # Image.fromarray(np.asarray(image)).show()
 
-    coord.request_stop()
-    coord.join(threads)
-'''
+def main(unused_argv):
+    # train_data is a int32 training data type
+    train_data, train_labels = dogedata.create_dataset(
+        "/home/oleg/Pictures/classification_data/training/doge/",
+        "/home/oleg/Pictures/classification_data/training/not-doge/")
+    eval_data, eval_labels = dogedata.create_dataset(
+        "/home/oleg/Pictures/classification_data/testing/doge/",
+        "/home/oleg/Pictures/classification_data/testing/not-doge/"
+    )
+    # Create an Estimator object which links the doge_convolution function as the training model
+    # And uses tmp/ to store the model results
+    classifier = tf.estimator.Estimator(model_fn=doge_convolution, model_dir='tmp/')
+
+    tensors_to_log = {"probabilities": "sigmoid_tensor"}
+    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=11)
+
+    train_input_fn = tf.estimator.inputs.numpy_input_fn(
+        x={"x": train_data},
+        y=train_labels,
+        batch_size=11,
+        num_epochs=None,
+        shuffle=True
+    )
+    classifier.train(input_fn=train_input_fn,
+                     steps=len(train_data),
+                     hooks=[logging_hook])
+    eval_input_fn = tf.estimator.inputs.numpy_input_fn(
+        x={"x": eval_data},
+        y=eval_labels,
+        num_epochs=1,
+        shuffle=False
+    )
+    eval_results = classifier.evaluate(input_fn=eval_input_fn)
+    print(eval_results)
+
+
+if __name__ == "__main__":
+    tf.app.run()
