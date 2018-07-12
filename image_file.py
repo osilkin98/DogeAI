@@ -29,6 +29,7 @@ class TempImage(object):
 
     def __del__(self):
         if os.path.exists(self.relative_path):
+            print("Removing file from {}".format(self.relative_path))
             os.remove(self.relative_path)
 
     def get_numpy(self):
