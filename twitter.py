@@ -2,7 +2,8 @@
 import keys
 import tweepy
 from image_file import TempImage
-import json
+import tensorflow as tf
+
 
 # set the keys in the authorization
 auth = tweepy.OAuthHandler(keys.consumer_key, keys.consumer_secret)
@@ -17,10 +18,27 @@ def get_image_from_tweet(target_tweet):
         return TempImage(image['media_url'])
 
 
+def test(image):
+    classifier = tf.estimator.Estimator(model_fn=doge_convolution, model_dir='trained_doge/')
+
+    test_input_fn = tf.estimator.inputs.numpy_input_fn(
+        x={"x": image},
+        shuffle=False,
+        num_epochs=1
+    )
+    test_results = list(classifier.predict(
+        input_fn=test_input_fn))
+    print(test_results)
+
+
+
+def doge_or_not_doge(target_tweet):
+    image = get_image_from_tweet(target_tweet)
+    test(image.get_numpy())
+
 def display_image_from_tweet(target_tweet):
     if 'media' in target_tweet.entities:
-        my_image = get_image_from_tweet(target_tweet)
-        my_image.image.show()
+        doge_or_not_doge(target_tweet)
     else:
         print("Tweet by {} was not an image, tweet body: {}".format(target_tweet.user.screen_name, target_tweet.text))
 
@@ -47,7 +65,7 @@ try:
 
     myStreamListener = MyStreamListener()
     myStream = tweepy.Stream(auth = api.auth, listener=myStreamListener)
-    myStream.filter(track=["@doge_or"], is_async=True)
+    myStream.filter(track=["@doge_or"])
 
     '''
     # retrieve the first post from timeline
@@ -55,8 +73,8 @@ try:
     display_image_from_tweet(first_tweet)
     '''
 except tweepy.TweepError as e:
-    print(e.message)
+    print(e)
 except Exception as e:
-    print(e.message)
+    print(e)
 finally:
     print("Program Finished Execution")
