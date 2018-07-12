@@ -30,7 +30,7 @@ def identify_doge(image):
         num_epochs=1
     )
     return list(classifier.predict(
-        input_fn=test_input_fn))[0]["classes"]
+        input_fn=test_input_fn))[0]
 
 
 
@@ -39,9 +39,13 @@ def doge_or_not_doge(target_tweet):
     # Image was Doge
     # print(json.dumps(target_tweet.entities, indent=4, sort_keys=True, separators=(',', ': ')))
     print("tweet id: {}".format(target_tweet.id))
-    if identify_doge(image.get_numpy()) == 1:
+    doger = identify_doge(image.get_numpy())
+    print(doger)
+    if doger['classes'] == 1:
         print("doge")
-        api.update_status("@{} doge".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
+        api.update_status("@{} doge,\n\n(Probability of doge: {})".format(
+            target_tweet.user.screen_name,
+            doger['probabilities'][1]), in_reply_to_status_id=target_tweet.id)
     # Image was Not Doge
     else:
         print("not doge")
