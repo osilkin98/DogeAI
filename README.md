@@ -1,3 +1,3 @@
 # Not Hot-Doge
+Image classifer that recognizes whether or not an image tweeted to it is of doge or not
 
-This is a project intended to classify whether or not an image is a picture of Doge
