@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
 import dogedata
+import cv2
+
 
 
 def doge_convolution(features, labels, mode):
@@ -99,8 +101,25 @@ def doge_convolution(features, labels, mode):
         "accuracy": tf.metrics.accuracy(labels=labels, predictions=predictions["classes"])
     }
 
+    # Return in evaluation mode
     return tf.estimator.EstimatorSpec(mode=mode, loss=loss, eval_metric_ops=eval_ops_metrics)
 
+
+
+def test(image_path):
+    original_image = cv2.imread(image_path)
+    print(original_image)
+'''
+
+    test_input_fn = tf.estimator.inputs.numpy_input_fn(
+        x={"x": image},
+        shuffle=False,
+        num_epochs=1
+    )
+    test_results = list(classifier.predict(
+        input_fn=test_input_fn))
+    print(test_results)
+'''
 
 def main(unused_argv):
     # train_data is a int32 training data type
@@ -113,7 +132,8 @@ def main(unused_argv):
     )
     # Create an Estimator object which links the doge_convolution function as the training model
     # And uses tmp/ to store the model results
-    classifier = tf.estimator.Estimator(model_fn=doge_convolution, model_dir='tmp/')
+    classifier = tf.estimator.Estimator(
+        model_fn=doge_convolution, model_dir='tmp/')
 
     tensors_to_log = {"probabilities": "softmax_tensor"}
     logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=110)
@@ -137,5 +157,6 @@ def main(unused_argv):
     print(eval_results)
 
 
-if __name__ == "__main__":
-    tf.app.run()
+
+
+test('/home/oleg/Pictures/classification_data/training/doge/test.jpg')
