@@ -69,7 +69,7 @@ def doge_convolution(features, labels, mode):
         strides=2
     )
     # single layer with 1,728 neurons
-    flatten_pooling_layer_2 = tf.reshape(pooling_layer_2, [-1, 6 * 6 * 48])
+    flatten_pooling_layer_2 = tf.reshape(pooling_layer_4, [-1, 6 * 6 * 48])
 
     dense = tf.layers.dense(inputs=flatten_pooling_layer_2, units=1024, activation=tf.nn.relu)
 
@@ -78,20 +78,19 @@ def doge_convolution(features, labels, mode):
     # possible outcomes: doge or not doge
     logits = tf.layers.dense(inputs=dropout, units=2)
 
-    tf
     predictions = {
         "classes": tf.argmax(input=logits, axis=1),
-        "probabilities": tf.nn.sigmoid(logits, name="sigmoid_tensor")
+        "probabilities": tf.nn.sigmoid(logits, name="softmax_tensor")
     }
 
     if mode == tf.estimator.ModeKeys.PREDICT:
         return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
 
     # Calculate loss for training and evaluation modes
-    loss = tf.losses.sigmoid_cross_entropy(labels=labels, logits=logits)
+    loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
 
     if mode == tf.estimator.ModeKeys.TRAIN:
-        optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.075)
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
         train_op = optimizer.minimize(loss=loss,
                                       global_step=tf.train.get_global_step())
         return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
@@ -116,23 +115,22 @@ def main(unused_argv):
     # And uses tmp/ to store the model results
     classifier = tf.estimator.Estimator(model_fn=doge_convolution, model_dir='tmp/')
 
-    tensors_to_log = {"probabilities": "sigmoid_tensor"}
-    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=11)
+    tensors_to_log = {"probabilities": "softmax_tensor"}
+    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=110)
 
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": train_data},
         y=train_labels,
-        batch_size=11,
+        batch_size=1,
         num_epochs=None,
         shuffle=True
     )
-    classifier.train(input_fn=train_input_fn,
-                     steps=len(train_data),
+    classifier.train(input_fn=train_input_fn, steps=660,
                      hooks=[logging_hook])
     eval_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": eval_data},
         y=eval_labels,
-        num_epochs=1,
+        num_epochs=5,
         shuffle=False
     )
     eval_results = classifier.evaluate(input_fn=eval_input_fn)
