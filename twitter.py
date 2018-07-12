@@ -43,7 +43,7 @@ def doge_or_not_doge(target_tweet):
     print(doger)
     if doger['classes'] == 1:
         print("doge")
-        api.update_status("@{} doge,\n\n(Probability of doge: {})".format(
+        api.update_status("@{} doge\n\n(Probability of doge: {})".format(
             target_tweet.user.screen_name,
             doger['probabilities'][1]), in_reply_to_status_id=target_tweet.id)
     # Image was Not Doge
@@ -51,7 +51,7 @@ def doge_or_not_doge(target_tweet):
         print("not doge")
         api.update_status("@{} not doge\n\n(Probability of doge: {})".format(
             target_tweet.user.screen_name,
-            doger['probabilities'][0]
+            doger['probabilities'][1]
         ), in_reply_to_status_id=target_tweet.id)
 
 
