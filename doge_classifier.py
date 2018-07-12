@@ -106,22 +106,6 @@ def doge_convolution(features, labels, mode):
 
 
 
-def test(image_path):
-    image = dogedata.get_numpy_image_array(image_path)
-    print(image.shape)
-
-    classifier = tf.estimator.Estimator(model_fn=doge_convolution, model_dir='trained_doge/')
-
-    test_input_fn = tf.estimator.inputs.numpy_input_fn(
-        x={"x": image},
-        shuffle=False,
-        num_epochs=1
-    )
-    test_results = list(classifier.predict(
-        input_fn=test_input_fn))
-    print(test_results)
-
-
 def main(unused_argv):
     # train_data is a int32 training data type
     train_data, train_labels = dogedata.create_dataset(
