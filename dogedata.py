@@ -69,3 +69,18 @@ def create_dataset(directory1, directory2):
     finally:
         return np.array(img_array, dtype=np.float32), np.array(labels, dtype=np.int32)
 
+
+def get_numpy_image_array(image_path):
+    img_array = []
+    try:
+        image = cv2.imread(image_path)
+        if image.shape[0] != 96 or image_path.shape[1] != 96:
+            print("{} are incorrect dimensions, resizing...".format(image.shape))
+            image = cv2.resize(image, (96, 96))
+        img_array.append(np.true_divide(image.astype(np.float32), 255))
+    except FileNotFoundError as e:
+        print("{} does not exist".format(e.filename))
+    except NotADirectoryError as e:
+        print("{} is not a directory, strerror: {}".format(e.filename, e.strerror))
+    finally:
+        return np.array(img_array)
