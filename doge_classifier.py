@@ -146,4 +146,3 @@ def main(unused_argv):
 if __name__ == "__main__":
   tf.app.run()
 '''
-test('/home/oleg/Pictures/Doge/9194_756202991184039_7525067723475525842_n.jpg')
