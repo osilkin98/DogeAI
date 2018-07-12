@@ -4,11 +4,14 @@ import tweepy
 from image_file import TempImage
 import tensorflow as tf
 import doge_classifier as dc
-
+import json
 # set the keys in the authorization
 auth = tweepy.OAuthHandler(keys.consumer_key, keys.consumer_secret)
 auth.set_access_token(keys.access_token, keys.access_token_secret)
-
+try:
+    api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+except Exception as e:
+    print("Exception e raised: {}".format(e))
 
 # returns image object from tweet
 def get_image_from_tweet(target_tweet):
@@ -18,7 +21,7 @@ def get_image_from_tweet(target_tweet):
         return TempImage(image['media_url'])
 
 
-def test(image):
+def identify_doge(image):
     classifier = tf.estimator.Estimator(model_fn=dc.doge_convolution, model_dir='trained_doge/')
 
     test_input_fn = tf.estimator.inputs.numpy_input_fn(
@@ -26,15 +29,24 @@ def test(image):
         shuffle=False,
         num_epochs=1
     )
-    test_results = list(classifier.predict(
-        input_fn=test_input_fn))
-    print(test_results)
+    return list(classifier.predict(
+        input_fn=test_input_fn))[0]["classes"]
 
 
 
 def doge_or_not_doge(target_tweet):
     image = get_image_from_tweet(target_tweet)
-    test(image.get_numpy())
+    # Image was Doge
+    # print(json.dumps(target_tweet.entities, indent=4, sort_keys=True, separators=(',', ': ')))
+    print("tweet id: {}".format(target_tweet.id))
+    if identify_doge(image.get_numpy()) == 1:
+        print("doge")
+        api.update_status("doge", in_reply_to_status_id=target_tweet.id)
+    # Image was Not Doge
+    else:
+        print("not doge")
+        api.update_status("doge", in_reply_to_status_id=target_tweet.id)
+
 
 def display_image_from_tweet(target_tweet):
     if 'media' in target_tweet.entities:
@@ -59,7 +71,6 @@ class MyStreamListener(tweepy.StreamListener):
 
 
 try:
-    api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
     user = api.me()
 
