@@ -36,7 +36,6 @@ def identify_doge(image):
         input_fn=test_input_fn))[0]
 
 
-
 def doge_or_not_doge(target_tweet):
     print("entered doge or not doge")
     image = get_image_from_tweet(target_tweet)
@@ -45,16 +44,20 @@ def doge_or_not_doge(target_tweet):
     print("tweet id: {}".format(target_tweet.id))
     doger = identify_doge(image.get_numpy())
     print(doger)
-    if doger['classes'] == 1:
-        print("doge")
-        api.update_status("@{} doge".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
+    if doger['probabilities'][1] >= 0.8:
+        print("very doge")
+        api.update_status("@{} very doge!".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
     # Image was Not Doge
+    elif 0.8 > doger['probabilities'][1] >= 0.6:
+        api.update_status("@{} wow, doge!".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
+    elif 0.5 <= doger['probabilities'][1] < 0.6:
+        api.update_status("@{} much doge".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
+    elif 0.3 <= doger['probabilities'][1] < 0.5:
+        api.update_status("@{} maybe doge".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
     else:
-        print("not doge")
-        api.update_status("@{} not doge\n\n(Probability of doge: {})".format(
-            target_tweet.user.screen_name,
-            doger['probabilities'][1]
-        ), in_reply_to_status_id=target_tweet.id)
+        print("wow not doge")
+        api.update_status(
+            "@{} wow not doge, much sad".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
 
 
 def display_image_from_tweet(target_tweet):
@@ -77,9 +80,9 @@ class MyStreamListener(tweepy.StreamListener):
             print("Status code 420, returning")
             return False
 
-    def __del__(self):
+    def __exit__(self, exc_type, exc_val, exc_tb):
         try:
-            api.update_status("Going Down For Maintenance at {}".format(datetime.datetime.now()))
+            api.update_status("Going Offline {}".format(datetime.datetime.now()))
             api.update_profile(description="[OFFLINE] {}".format(api.me().description))
         except tweepy.TweepError as e:
             print("{}".format(e.response))
@@ -101,10 +104,13 @@ try:
     print("Listening in on '@doge_or'")
     myStream.filter(track=["@doge_or"])
 
+    api.update_status("Going Offline {}".format(datetime.datetime.now()))
+    api.update_profile(description="[OFFLINE] {}".format(api.me().description))
+
 except tweepy.TweepError as e:
     print(e)
 except KeyboardInterrupt as ki:
-    print("{}".format(ki.args))
+    print("{}".format(ki))
 except Exception as e:
     print(e)
 finally:
