@@ -47,9 +47,7 @@ def doge_or_not_doge(target_tweet):
     print(doger)
     if doger['classes'] == 1:
         print("doge")
-        api.update_status("@{} doge\n\n(Probability of doge: {})".format(
-            target_tweet.user.screen_name,
-            doger['probabilities'][1]), in_reply_to_status_id=target_tweet.id)
+        api.update_status("@{} doge".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
     # Image was Not Doge
     else:
         print("not doge")
@@ -82,16 +80,9 @@ class MyStreamListener(tweepy.StreamListener):
     def __del__(self):
         try:
             api.update_status("Going Down For Maintenance at {}".format(datetime.datetime.now()))
-            api.update_profile(description="[DOWN FOR MAINTENANCE] {}".format(api.me().description))
+            api.update_profile(description="[OFFLINE] {}".format(api.me().description))
         except tweepy.TweepError as e:
             print("{}".format(e.response))
-    ''' 
-    def on_event(self, status):
-        print("[MyStreamListener.on_event]: {}".format(status))
-
-    def on_data(self, raw_data):
-        print("[MyStreamListener.on_data]: {}".format(raw_data))
-    '''
 
 
 try:
@@ -99,7 +90,7 @@ try:
     user = api.me()
 
     print("Changing Description to be online...")
-    api.update_profile(description=api.me().description.replace("[DOWN FOR MAINTENANCE] ", ""))
+    api.update_profile(description=api.me().description.replace("[OFFLINE] ", ""))
 
     print("Creating Stream Listener...")
     myStreamListener = MyStreamListener()
@@ -110,11 +101,6 @@ try:
     print("Listening in on '@doge_or'")
     myStream.filter(track=["@doge_or"])
 
-    '''
-    # retrieve the first post from timeline
-    first_tweet = api.home_timeline()[0]
-    display_image_from_tweet(first_tweet)
-    '''
 except tweepy.TweepError as e:
     print(e)
 except KeyboardInterrupt as ki:
