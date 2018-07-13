@@ -82,6 +82,7 @@ class MyStreamListener(tweepy.StreamListener):
     def __del__(self):
         try:
             api.update_status("Going Down For Maintenance at {}".format(datetime.datetime.now()))
+            api.update_profile(description="[DOWN FOR MAINTENANCE] {}".format(api.me().description))
         except tweepy.TweepError as e:
             print("{}".format(e.response))
     ''' 
@@ -94,12 +95,19 @@ class MyStreamListener(tweepy.StreamListener):
 
 
 try:
-
+    print("Starting up...")
     user = api.me()
 
+    print("Changing Description to be online...")
+    api.update_profile(description=api.me().description.replace("[DOWN FOR MAINTENANCE] ", ""))
+
+    print("Creating Stream Listener...")
     myStreamListener = MyStreamListener()
+
+    print("Connecting myStreamListener to twitter api...")
     myStream = tweepy.Stream(auth = api.auth, listener=myStreamListener)
-    print("listening")
+
+    print("Listening in on '@doge_or'")
     myStream.filter(track=["@doge_or"])
 
     '''

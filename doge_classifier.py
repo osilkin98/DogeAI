@@ -109,7 +109,7 @@ def doge_convolution(features, labels, mode):
 def main(unused_argv):
     # train_data is a int32 training data type
     train_data, train_labels = dogedata.create_dataset(
-        "/home/oleg/Pictures/classification_data/training/doge/",
+        "/home/oleg/Pictures/Doge/",
         "/home/oleg/Pictures/classification_data/training/not-doge/")
     eval_data, eval_labels = dogedata.create_dataset(
         "/home/oleg/Pictures/classification_data/testing/doge/",
@@ -126,11 +126,11 @@ def main(unused_argv):
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": train_data},
         y=train_labels,
-        batch_size=1,
+        batch_size=50,
         num_epochs=None,
         shuffle=True
     )
-    classifier.train(input_fn=train_input_fn, steps=660,
+    classifier.train(input_fn=train_input_fn, steps=len(train_data),
                      hooks=[logging_hook])
     eval_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": eval_data},
