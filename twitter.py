@@ -44,9 +44,13 @@ def doge_or_not_doge(target_tweet):
     print("tweet id: {}".format(target_tweet.id))
     doger = identify_doge(image.get_numpy())
     print(doger)
+    api.send_direct_message("{}".format(keys.log_username), text="Image {} got a doge probability of {}".format(
+                                target_tweet.entities['media'][0]['media_url'], doger['probabilities'][1]))
+
     if doger['probabilities'][1] >= 0.8:
         print("very doge")
-        api.update_status("@{} very doge!".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
+        api.update_status("@{} Such doge, much excite!".format(target_tweet.user.screen_name),
+                          in_reply_to_status_id=target_tweet.id)
     # Image was Not Doge
     elif 0.8 > doger['probabilities'][1] >= 0.6:
         api.update_status("@{} wow, doge!".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
@@ -100,6 +104,8 @@ try:
 
     print("Connecting myStreamListener to twitter api...")
     myStream = tweepy.Stream(auth = api.auth, listener=myStreamListener)
+
+    api.update_status("[{}:{}] Doge is online".format(datetime.datetime.now().hour, datetime.datetime.now().minute))
 
     print("Listening in on '@doge_or'")
     myStream.filter(track=["@doge_or"])
