@@ -13,6 +13,9 @@ class TempImage(object):
     # Default constructor
     def __init__(self, outside_url=None):
         try:
+            if not os.path.exists("{}/{}".format(os.getcwd(),temp_directory)):
+                os.mkdir("{}/{}".format(os.getcwd(), temp_directory))
+
             # tries to get the url from the outside world
             self.url = outside_url
 
@@ -23,14 +26,7 @@ class TempImage(object):
             try:
                 self.relative_path = temp_directory + "image{}.jpg".format(len(os.listdir(temp_directory)) + 1)
             except Exception as ae:
-                print("Attribute error was raised: {}".format(ae.__cause__))
-
-                # to create a temporary directory by concatenating the current directory with the temp_directory
-                os.mkdir("{}/{}".format(os.getcwd(), temp_directory), 755)
-
-                # if we got an attribute error, it would really only be due to the fact that the tmp/ directory doesn't
-                # exist, and since we made it again, we'll have to re-declare the self.relative_path variable
-                self.relative_path = temp_directory + "image{}.jpg".format(len(os.listdir(temp_directory)) + 1)
+                print("Attribute error was raised: {}".format(ae))
 
             finally:
 
