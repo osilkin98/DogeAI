@@ -107,8 +107,8 @@ try:
 
     api.update_status("[{}:{}] Doge is online".format(datetime.datetime.now().hour, datetime.datetime.now().minute))
 
-    print("Listening in on '@doge_or'")
-    myStream.filter(track=["@doge_or"])
+    print("Listening in on '@{}'".format(keys.listen_username))
+    myStream.filter(track=["@{}".format(keys.listen_username)])
 
     api.update_status("Going Offline {}".format(datetime.datetime.now()))
     api.update_profile(description="[OFFLINE] {}".format(api.me().description))
