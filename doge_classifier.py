@@ -121,12 +121,12 @@ def main(unused_argv):
         model_fn=doge_convolution, model_dir='trained_doge/')
 
     tensors_to_log = {"probabilities": "softmax_tensor"}
-    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=110)
+    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50)
 
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": train_data},
         y=train_labels,
-        batch_size=50,
+        batch_size=10,
         num_epochs=None,
         shuffle=True
     )
@@ -135,7 +135,7 @@ def main(unused_argv):
     eval_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": eval_data},
         y=eval_labels,
-        num_epochs=5,
+        num_epochs=1,
         shuffle=False
     )
     eval_results = classifier.evaluate(input_fn=eval_input_fn)
