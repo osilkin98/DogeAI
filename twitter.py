@@ -44,8 +44,11 @@ def doge_or_not_doge(target_tweet):
     print("tweet id: {}".format(target_tweet.id))
     doger = identify_doge(image.get_numpy())
     print(doger)
-    api.send_direct_message("{}".format(keys.log_username), text="Image {} got a doge probability of {}".format(
-                                target_tweet.entities['media'][0]['media_url'], doger['probabilities'][1]))
+    api.send_direct_message("{}".format(keys.log_username),
+                            text="Image {} sent from @{} got a doge probability of {}".format(
+                                target_tweet.entities['media'][0]['media_url'],
+                                target_tweet.user.screen_name,
+                                doger['probabilities'][1]))
 
     if doger['probabilities'][1] >= 0.8:
         print("very doge")
