@@ -37,7 +37,7 @@ def identify_doge(image):
 
 
 def doge_or_not_doge(target_tweet):
-    print("entered doge or not doge")
+    # print("entered doge or not doge")
     image = get_image_from_tweet(target_tweet)
     # Image was Doge
     # print(json.dumps(target_tweet.entities, indent=4, sort_keys=True, separators=(',', ': ')))
