@@ -108,7 +108,7 @@ try:
     print("Connecting myStreamListener to twitter api...")
     myStream = tweepy.Stream(auth = api.auth, listener=myStreamListener)
 
-    api.update_status("[{}:{}] Doge is online".format(datetime.datetime.now().hour, datetime.datetime.now().minute))
+    api.send_direct_message( "{}".format(keys.log_username), text="[{}:{}] Doge is online".format(datetime.datetime.now().hour, datetime.datetime.now().minute))
 
     print("Listening in on '@{}'".format(keys.listen_username))
     myStream.filter(track=["@{}".format(keys.listen_username)])
