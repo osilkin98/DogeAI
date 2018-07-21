@@ -1,8 +1,14 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+
 import tensorflow as tf
 import numpy as np
 import dogedata
 import cv2
 
+tf.logging.set_verbosity(tf.logging.INFO)
 
 
 def doge_convolution(features, labels, mode):
@@ -117,21 +123,33 @@ def main(unused_argv):
     )
     # Create an Estimator object which links the doge_convolution function as the training model
     # And uses tmp/ to store the model results
-    classifier = tf.estimator.Estimator(
-        model_fn=doge_convolution, model_dir='trained_doge/')
+    classifier = tf.estimator.Estimator(model_fn=doge_convolution,
+                                        model_dir='trained_doge/',
+                                        config=tf.estimator.RunConfig(log_step_count_steps=250))
 
     tensors_to_log = {"probabilities": "sigmoid_tensor"}
-    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=100)
+    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log,
+                                              every_n_iter=500)
+
+    epoch_count, data_size = 40, len(train_data)
+    print(data_size)
 
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": train_data},
         y=train_labels,
-        batch_size=10,
-        num_epochs=30,
+        batch_size=20,
+        num_epochs=epoch_count,
         shuffle=True
     )
-    classifier.train(input_fn=train_input_fn, steps=len(train_data),
-                     hooks=[logging_hook])
+
+    aster = 40
+
+    for i in range(1, epoch_count+1):
+        print("{} ITERATION {} {}".format('*'*aster, i, '*'*aster))
+        classifier.train(input_fn=train_input_fn,
+                         hooks=[logging_hook],
+                         steps=data_size*epoch_count)
+
     eval_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": eval_data},
         y=eval_labels,
@@ -144,4 +162,4 @@ def main(unused_argv):
 
 
 if __name__ == "__main__":
-  tf.app.run()
+  main('')
