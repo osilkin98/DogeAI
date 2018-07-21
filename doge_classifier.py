@@ -121,7 +121,7 @@ def main(unused_argv):
         model_fn=doge_convolution, model_dir='trained_doge/')
 
     tensors_to_log = {"probabilities": "sigmoid_tensor"}
-    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50)
+    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=100)
 
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": train_data},
