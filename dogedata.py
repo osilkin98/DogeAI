@@ -45,33 +45,54 @@ def create_dataset(directory1, directory2):
         total_size = len(files[0]) + len(files[1])
         # Move all the files from the directory listing into cv2 arrays, and then remove them from the program's memory
         while total_size > 0:
+
             # use p <= doge_size / total_size for a discrete random variable p to ensure a rolling even spread of 50/50
             if len(files[1]) == 0 or (random.random() <= float(len(files[0])) / total_size and len(files[0]) != 0):
+
+                # pick a random doge file from our set of files
                 random_doge = files[0][random.randint(0, len(files[0]) - 1)]
+
                 # if the file selected is a jpeg
                 if (random_doge[len(random_doge)-4:len(random_doge)].lower() == ".jpg") or \
                         (random_doge[len(random_doge)-5:len(random_doge)].lower() == ".jpeg"):
                     try:
-                        # Read the image in with cv2
+
+                        # Read it in with cv2
                         doge_image = cv2.imread("{}{}".format(directory1, random_doge))
-                        # Reshape the image
+
+                        # If its dimensions are something other than 96x96, we just reshape it
                         if doge_image.shape[0] != 96 or doge_image.shape[1] != 96:
                             doge_image = cv2.resize(doge_image, (96, 96))
 
-                        # Format the image type and append it to the array
+                        # Format the image type as a 32-bit float and append it to the array
                         img_array.append(np.true_divide(doge_image.astype(np.float32), 255))
-                        labels.append(1) # append the doge label
+
+                        # append the doge label
+                        labels.append(1)
+
+                    # if something went wrong, we print the base exception
                     except Exception as e:
                         print("{}".format(e))
                     finally:
+
+                        # remove the doge_file from the program's memory
                         files[0].remove(random_doge)
+
                 # if the files are unrecognized
                 else:
+                    # remove it from the program's memory
                     files[0].remove(random_doge)
+
+                    # decrement the total size
                     total_size -= 1
                     continue
             # otherwise we're looking at non-doge files
             else:
+                # pick a not doge at random
+                ''' Essentially at this point all the code is virtually the same as above 
+                    so there's no need to really annotate anything and since I'm lazy I never moved 
+                    these very functional routines to another function.  ¯\_(ツ)_/¯ 
+                '''
                 random_notdoge = files[1][random.randint(0, len(files[1]) - 1)]
                 if (random_notdoge[len(random_notdoge)-4:len(random_notdoge)].lower() == ".jpg") or \
                     (random_notdoge[len(random_notdoge)-5:len(random_notdoge)].lower() == ".jpeg"):
