@@ -127,7 +127,7 @@ def main(unused_argv):
         x={"x": train_data},
         y=train_labels,
         batch_size=10,
-        num_epochs=None,
+        num_epochs=30,
         shuffle=True
     )
     classifier.train(input_fn=train_input_fn, steps=len(train_data),
