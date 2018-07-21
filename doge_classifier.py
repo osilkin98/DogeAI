@@ -82,7 +82,7 @@ def doge_convolution(features, labels, mode):
 
     predictions = {
         "classes": tf.argmax(input=logits, axis=1),
-        "probabilities": tf.nn.sigmoid(logits, name="softmax_tensor")
+        "probabilities": tf.nn.sigmoid(logits, name="sigmoid_tensor")
     }
 
     if mode == tf.estimator.ModeKeys.PREDICT:
@@ -120,7 +120,7 @@ def main(unused_argv):
     classifier = tf.estimator.Estimator(
         model_fn=doge_convolution, model_dir='trained_doge/')
 
-    tensors_to_log = {"probabilities": "softmax_tensor"}
+    tensors_to_log = {"probabilities": "sigmoid_tensor"}
     logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50)
 
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
