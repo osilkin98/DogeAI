@@ -87,6 +87,9 @@ class MyStreamListener(tweepy.StreamListener):
             print("Status code 420, returning")
             return False
 
+    def on_data(self, raw_data):
+        print("got raw data: {}".format(json.dumps(raw_data, indent=4, sort_keys=True)))
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
             api.update_status("Going Offline {}".format(datetime.datetime.now()))
