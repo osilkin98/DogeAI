@@ -90,6 +90,9 @@ class MyStreamListener(tweepy.StreamListener):
     def on_data(self, raw_data):
         print("got raw data: {}".format(json.dumps(raw_data, indent=4, sort_keys=True)))
 
+    def on_direct_message(self, status):
+        print("Got direct message {} from {}".format(status.text, status.user.screen_name))
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
             api.update_status("Going Offline {}".format(datetime.datetime.now()))
