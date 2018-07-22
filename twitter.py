@@ -50,7 +50,7 @@ def doge_or_not_doge(target_tweet):
     print(doger)
     api.send_direct_message("{}".format(keys.log_username),
                             text="Image {} sent from @{} got a doge probability \
-                            of {0.3f}%\n\nTime taken for image convolution: {:0.3f} seconds".format(
+of {:0.3f}%\n\nTime taken for image convolution: {:0.3f} seconds".format(
                                 target_tweet.entities['media'][0]['media_url'],
                                 target_tweet.user.screen_name,
                                 doger['probabilities'][1] * 100,
