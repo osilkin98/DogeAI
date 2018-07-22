@@ -2,12 +2,14 @@
 import keys
 import tweepy
 from image_file import TempImage
+print("importing Tensorflow...")
 import tensorflow as tf
 import doge_classifier as dc
 import json
 import datetime
+from time import time
 
-# set the keys in the authorization
+# set the keys in the authoriza tion
 auth = tweepy.OAuthHandler(keys.consumer_key, keys.consumer_secret)
 auth.set_access_token(keys.access_token, keys.access_token_secret)
 try:
@@ -42,13 +44,18 @@ def doge_or_not_doge(target_tweet):
     # Image was Doge
     # print(json.dumps(target_tweet.entities, indent=4, sort_keys=True, separators=(',', ': ')))
     print("tweet id: {}".format(target_tweet.id))
+    start_time = time()
     doger = identify_doge(image.get_numpy())
+    end_time = time()
     print(doger)
     api.send_direct_message("{}".format(keys.log_username),
-                            text="Image {} sent from @{} got a doge probability of {}".format(
+                            text="Image {} sent from @{} got a doge probability \
+                            of {}\n\nTime taken for image convolution: {:0.3f} seconds".format(
                                 target_tweet.entities['media'][0]['media_url'],
                                 target_tweet.user.screen_name,
-                                doger['probabilities'][1]))
+                                doger['probabilities'][1],
+                                (end_time - start_time))
+                            )
 
     if doger['probabilities'][1] >= 0.8:
         print("very doge")
