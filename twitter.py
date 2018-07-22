@@ -50,10 +50,10 @@ def doge_or_not_doge(target_tweet):
     print(doger)
     api.send_direct_message("{}".format(keys.log_username),
                             text="Image {} sent from @{} got a doge probability \
-                            of {}\n\nTime taken for image convolution: {:0.3f} seconds".format(
+                            of {0.3f}\n\nTime taken for image convolution: {:0.3f} seconds".format(
                                 target_tweet.entities['media'][0]['media_url'],
                                 target_tweet.user.screen_name,
-                                doger['probabilities'][1],
+                                doger['probabilities'][1] * 100,
                                 (end_time - start_time))
                             )
 
@@ -102,7 +102,8 @@ class MyStreamListener(tweepy.StreamListener):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
-            api.update_status("Going Offline {}".format(datetime.datetime.now()))
+            api.send_direct_message("{}".format(keys.log_username),
+                                    text="Going Offline {}".format(datetime.datetime.now()))
             api.update_profile(description="[OFFLINE] {}".format(api.me().description))
         except tweepy.TweepError as e:
             print("{}".format(e.response))
@@ -121,7 +122,9 @@ try:
     print("Connecting myStreamListener to twitter api...")
     myStream = tweepy.Stream(auth = api.auth, listener=myStreamListener)
 
-    api.send_direct_message( "{}".format(keys.log_username), text="[{}:{}] Doge is online".format(datetime.datetime.now().hour, datetime.datetime.now().minute))
+    api.send_direct_message( "{}".format(keys.log_username),
+                             text="[{}:{}] Doge is online".format(datetime.datetime.now().hour,
+                                                                  datetime.datetime.now().minute))
 
     print("Listening in on '@{}'".format(keys.listen_username))
     myStream.filter(track=["@{}".format(keys.listen_username)])
