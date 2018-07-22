@@ -8,7 +8,7 @@ import numpy as np
 import dogedata
 import cv2
 
-tf.logging.set_verbosity(tf.logging.INFO)
+tf.logging.set_verbosity(tf.logging.ERROR)
 
 
 def doge_convolution(features, labels, mode):
