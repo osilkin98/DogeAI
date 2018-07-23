@@ -25,6 +25,7 @@ class TempImage(object):
             # tmp directory to vcs, it's not a good idea because it would be an empty directory.
             try:
                 self.relative_path = temp_directory + "image{}.jpg".format(len(os.listdir(temp_directory)) + 1)
+                self.absolute_path = "{}/{}".format(os.getcwd(), self.relative_path)
             except Exception as ae:
                 print("Attribute error was raised: {}".format(ae))
 
