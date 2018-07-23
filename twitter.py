@@ -10,6 +10,13 @@ import datetime
 from time import time
 
 
+#################################################################################################################
+# TODO(1): Create an LSTM RNN to generate doge-styled responses for funny captions                              #
+# TODO(2): Convert From Using a Binary Classifier to 3-Way Classifier to Filter out unwholesome Doges Submitted #
+# TODO(3): Create a WebPage to Display Wholesome User-Submitted Doge Images                                     #
+#################################################################################################################
+
+
 # set the keys in the authoriza tion
 auth = tweepy.OAuthHandler(keys.consumer_key, keys.consumer_secret)
 auth.set_access_token(keys.access_token, keys.access_token_secret)
@@ -92,6 +99,9 @@ of {:0.3f}%\n\nTime taken for image convolution: {:0.3f} seconds".format(
     if doger['classes'] == 1:
         try:
             print("Attempting to upload {}".format(image.absolute_path))
+            #################################################################
+            # TODO(1): Create an LSTM based RNN to generate funny responses #
+            #################################################################
             api.update_with_media(filename="{}".format(image.absolute_path),
                                   status="amazing doge submitted by @{}!".format(target_tweet.user.screen_name))
         except tweepy.TweepError as te:
