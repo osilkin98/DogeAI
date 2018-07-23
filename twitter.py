@@ -60,8 +60,10 @@ of {:0.3f}%\n\nTime taken for image convolution: {:0.3f} seconds".format(
 
     if doger['probabilities'][1] >= 0.8:
         print("very doge")
-        api.update_status("@{} Such doge, much excite!".format(target_tweet.user.screen_name),
-                          in_reply_to_status_id=target_tweet.id)
+
+        api.update_with_media(filename="{}".format(image.absolute_path),
+                              status="@{} Such doge, much excite!".format(target_tweet.user.screen_name),
+                              in_reply_to_status_id=target_tweet.id)
     # Image was Not Doge
     elif 0.8 > doger['probabilities'][1] >= 0.6:
         api.update_status("@{} wow, doge!".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
