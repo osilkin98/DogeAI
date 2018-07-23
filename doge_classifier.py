@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-
+import keys
 import tensorflow as tf
 import numpy as np
 import dogedata
@@ -35,8 +35,7 @@ def doge_convolution(features, labels, mode):
         filters=24,
         kernel_size=[5, 5],
         padding="same",
-        activation=tf.nn.relu
-    )
+        activation=tf.nn.relu)
 
     # second pooling layer: 48x48x24 -> 24x24x24 # conversion rate = 4
     pooling_layer_2 = tf.layers.max_pooling2d(
@@ -124,7 +123,7 @@ def main(unused_argv):
     # Create an Estimator object which links the doge_convolution function as the training model
     # And uses tmp/ to store the model results
     classifier = tf.estimator.Estimator(model_fn=doge_convolution,
-                                        model_dir='trained_doge/',
+                                        model_dir='{}'.format(keys.training_set_path),
                                         config=tf.estimator.RunConfig(log_step_count_steps=250))
 
     tensors_to_log = {"probabilities": "sigmoid_tensor"}

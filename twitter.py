@@ -18,7 +18,9 @@ except Exception as e:
     print("Exception e raised: {}".format(e))
 
 if __name__ == '__main__':
-    classifier = tf.estimator.Estimator(model_fn=dc.doge_convolution, model_dir='trained_doge/')
+    classifier = tf.estimator.Estimator(model_fn=dc.doge_convolution,
+                                        model_dir='{}'.format(keys.training_set_path)
+    )
 
 
 # returns image object from tweet
