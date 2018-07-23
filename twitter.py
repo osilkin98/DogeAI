@@ -17,6 +17,9 @@ try:
 except Exception as e:
     print("Exception e raised: {}".format(e))
 
+if __name__ == '__main__':
+    classifier = tf.estimator.Estimator(model_fn=dc.doge_convolution, model_dir='trained_doge/')
+
 
 # returns image object from tweet
 def get_image_from_tweet(target_tweet):
@@ -27,15 +30,11 @@ def get_image_from_tweet(target_tweet):
 
 
 def identify_doge(image):
-    classifier = tf.estimator.Estimator(model_fn=dc.doge_convolution, model_dir='trained_doge/')
-
-    test_input_fn = tf.estimator.inputs.numpy_input_fn(
+    return list(classifier.predict(input_fn=tf.estimator.inputs.numpy_input_fn(
         x={"x": image},
         shuffle=False,
-        num_epochs=1
-    )
-    return list(classifier.predict(
-        input_fn=test_input_fn))[0]
+        num_epochs=1)
+    ))[0]
 
 
 def doge_or_not_doge(target_tweet):
