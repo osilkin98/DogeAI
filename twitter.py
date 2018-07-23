@@ -106,7 +106,6 @@ of {:0.3f}%\n\nTime taken for image convolution: {:0.3f} seconds".format(
             send_error_message(e)
 
 
-
 def display_image_from_tweet(target_tweet):
     if 'media' in target_tweet.entities:
         doge_or_not_doge(target_tweet)
