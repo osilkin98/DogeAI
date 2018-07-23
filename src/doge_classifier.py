@@ -2,11 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import keys
 import tensorflow as tf
-import numpy as np
-import dogedata
-import cv2
+from src import dogedata, keys
 
 tf.logging.set_verbosity(tf.logging.INFO)
 

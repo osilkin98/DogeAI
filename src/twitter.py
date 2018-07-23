@@ -1,11 +1,9 @@
 # Import from a different file so as not to reveal keys to Git VCS
-import keys
+from src import keys, doge_classifier as dc
 import tweepy
-from image_file import TempImage
+from src.image_file import TempImage
 print("importing Tensorflow...")
 import tensorflow as tf
-import doge_classifier as dc
-import json
 import datetime
 from time import time
 
