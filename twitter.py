@@ -64,14 +64,13 @@ def doge_or_not_doge(target_tweet):
     doger = identify_doge(image.get_numpy())
     end_time = time()
     print(doger)
-    api.send_direct_message("{}".format(keys.log_username),
-                            text="Image {} sent from @{} got a doge probability \
+    log_message("Image {} sent from @{} got a doge probability \
 of {:0.3f}%\n\nTime taken for image convolution: {:0.3f} seconds".format(
                                 target_tweet.entities['media'][0]['media_url'],
                                 target_tweet.user.screen_name,
                                 doger['probabilities'][1] * 100,
                                 (end_time - start_time))
-                            )
+    )
 
     ''' Varied replies based on doge class probabilities '''
     if doger['probabilities'][1] >= 0.8:
@@ -102,6 +101,9 @@ of {:0.3f}%\n\nTime taken for image convolution: {:0.3f} seconds".format(
         except FileNotFoundError as fnf:
             print(fnf)
             send_error_message(fnf)
+        except Exception as e:
+            print(e)
+            send_error_message(e)
 
 
 
@@ -155,9 +157,7 @@ try:
     print("Connecting myStreamListener to twitter api...")
     myStream = tweepy.Stream(auth = api.auth, listener=myStreamListener)
 
-    api.send_direct_message( "{}".format(keys.log_username),
-                             text="[{}:{}] Doge is online".format(datetime.datetime.now().hour,
-                                                                  datetime.datetime.now().minute))
+    log_message("[{}:{}] Doge is online".format(datetime.datetime.now().hour, datetime.datetime.now().minute))
 
     print("Listening in on '@{}'".format(keys.listen_username))
     myStream.filter(track=["@{}".format(keys.listen_username)])
