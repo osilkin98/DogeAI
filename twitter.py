@@ -39,6 +39,8 @@ def identify_doge(image):
     ))[0]
 
 
+
+
 def doge_or_not_doge(target_tweet):
     # print("entered doge or not doge")
     image = get_image_from_tweet(target_tweet)
@@ -58,13 +60,11 @@ of {:0.3f}%\n\nTime taken for image convolution: {:0.3f} seconds".format(
                                 (end_time - start_time))
                             )
 
+    ''' Varied replies based on doge class probabilities '''
     if doger['probabilities'][1] >= 0.8:
         print("very doge")
-
-        api.update_with_media(filename="{}".format(image.absolute_path),
-                              status="@{} Such doge, much excite!".format(target_tweet.user.screen_name),
-                              in_reply_to_status_id=target_tweet.id)
-    # Image was Not Doge
+        api.update_status("@{} Such doge, much excite!".format(target_tweet.user.screen_name),
+                          in_reply_to_status_id=target_tweet.id)
     elif 0.8 > doger['probabilities'][1] >= 0.6:
         api.update_status("@{} wow, doge!".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
     elif 0.5 <= doger['probabilities'][1] < 0.6:
@@ -75,6 +75,15 @@ of {:0.3f}%\n\nTime taken for image convolution: {:0.3f} seconds".format(
         print("wow not doge")
         api.update_status(
             "@{} wow not doge, much sad".format(target_tweet.user.screen_name), in_reply_to_status_id=target_tweet.id)
+
+    # Regardless of the probability, if the classifer detected a doge
+    if doger['classes'] == 1:
+        try:
+            print("Attempting to upload {}".format(image.absolute_path))
+            api.update_with_media(filename="{}".format(image.absolute_path),
+                                  status="amazing doge submitted by @{}!".format(target_tweet.user.screen_name))
+        except tweepy.TweepError as te:
+            print("Updating with Media {} failed: {}".format(image.absolute_path, te))
 
 
 def display_image_from_tweet(target_tweet):
