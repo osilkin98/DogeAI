@@ -9,6 +9,7 @@ import json
 import datetime
 from time import time
 
+
 # set the keys in the authoriza tion
 auth = tweepy.OAuthHandler(keys.consumer_key, keys.consumer_secret)
 auth.set_access_token(keys.access_token, keys.access_token_secret)
@@ -31,6 +32,7 @@ def get_image_from_tweet(target_tweet):
         return TempImage(image['media_url'])
 
 
+# Take in an image object and return an estimator object that classifies whether or not the image is a doge
 def identify_doge(image):
     return list(classifier.predict(input_fn=tf.estimator.inputs.numpy_input_fn(
         x={"x": image},
@@ -39,8 +41,12 @@ def identify_doge(image):
     ))[0]
 
 
+def send_error_message(message):
+    api.send_direct_message(user="{}".format(keys.log_username),
+                            text="Ran Into Error: {}".format(message))
 
 
+# Main method to handle whether or not the image submitted was a doge and send out a tweet
 def doge_or_not_doge(target_tweet):
     # print("entered doge or not doge")
     image = get_image_from_tweet(target_tweet)
