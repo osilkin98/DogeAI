@@ -41,9 +41,16 @@ def identify_doge(image):
     ))[0]
 
 
+# Send an error message to the username receiving message logs
 def send_error_message(message):
     api.send_direct_message(user="{}".format(keys.log_username),
                             text="Ran Into Error: {}".format(message))
+
+
+# Send an ordinary log message to the user specified in the keys file
+def log_message(message):
+    api.send_direct_message(user="{}".format(keys.log_username),
+                            text=message)
 
 
 # Main method to handle whether or not the image submitted was a doge and send out a tweet
@@ -89,7 +96,13 @@ of {:0.3f}%\n\nTime taken for image convolution: {:0.3f} seconds".format(
             api.update_with_media(filename="{}".format(image.absolute_path),
                                   status="amazing doge submitted by @{}!".format(target_tweet.user.screen_name))
         except tweepy.TweepError as te:
-            print("Updating with Media {} failed: {}".format(image.absolute_path, te))
+            msg = "Updating with Media {} failed: {}".format(image.absolute_path, te)
+            print(msg)
+            send_error_message(msg)
+        except FileNotFoundError as fnf:
+            print(fnf)
+            send_error_message(fnf)
+
 
 
 def display_image_from_tweet(target_tweet):
@@ -110,6 +123,7 @@ class MyStreamListener(tweepy.StreamListener):
     def on_error(self, status_code):
         if status_code == 420:
             print("Status code 420, returning")
+            send_error_message(status_code)
             return False
 
     # def on_data(self, raw_data):
@@ -125,6 +139,7 @@ class MyStreamListener(tweepy.StreamListener):
             api.update_profile(description="[OFFLINE] {}".format(api.me().description))
         except tweepy.TweepError as e:
             print("{}".format(e.response))
+            send_error_message(e)
 
 
 try:
