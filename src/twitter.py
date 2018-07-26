@@ -2,6 +2,7 @@
 from src import keys, doge_classifier as dc
 import tweepy
 from src.image_file import TempImage
+import queue
 print("importing Tensorflow...")
 import tensorflow as tf
 import datetime
@@ -16,7 +17,7 @@ from time import time
 #################################################################################################################
 
 
-# set the keys in the authoriza tion
+# set the keys in the authorization
 auth = tweepy.OAuthHandler(keys.consumer_key, keys.consumer_secret)
 auth.set_access_token(keys.access_token, keys.access_token_secret)
 try:
@@ -40,6 +41,7 @@ def get_image_from_tweet(target_tweet):
 
 # Take in an image object and return an estimator object that classifies whether or not the image is a doge
 def identify_doge(image):
+    # creates and return an estimator object with an anonymous numpy input function creation
     return list(classifier.predict(input_fn=tf.estimator.inputs.numpy_input_fn(
         x={"x": image},
         shuffle=False,
@@ -115,7 +117,8 @@ of {:0.3f}%\n\nTime taken for image convolution: {:0.3f} seconds".format(
             send_error_message(e)
 
 
-def display_image_from_tweet(target_tweet):
+# this is a deprecated function
+def process_tweet(target_tweet):
     if 'media' in target_tweet.entities:
         doge_or_not_doge(target_tweet)
     else:
@@ -128,7 +131,7 @@ class MyStreamListener(tweepy.StreamListener):
         # print("Formatting as json: ")
         # print(json.dumps(status._json, sort_keys=True, indent=4, separators=(',', ': ')))
         print("got tweet: {}".format(status.text))
-        display_image_from_tweet(status)
+        process_tweet(status)
 
     def on_error(self, status_code):
         if status_code == 420:
@@ -152,6 +155,7 @@ class MyStreamListener(tweepy.StreamListener):
             send_error_message(e)
 
 
+# main function run stack
 try:
     print("Starting up...")
     user = api.me()
