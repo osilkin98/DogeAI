@@ -3,6 +3,7 @@ from src import keys, doge_classifier as dc
 import tweepy
 from src.image_file import TempImage
 import queue
+import threading
 print("importing Tensorflow...")
 import tensorflow as tf
 import datetime
@@ -20,6 +21,11 @@ from time import time
 # set the keys in the authorization
 auth = tweepy.OAuthHandler(keys.consumer_key, keys.consumer_secret)
 auth.set_access_token(keys.access_token, keys.access_token_secret)
+
+# set the tweet queue
+tweet_queue = queue.Queue()
+processing_thread_name = "main_processing_thread"
+
 try:
     api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 except Exception as e:
@@ -125,13 +131,37 @@ def process_tweet(target_tweet):
         print("Tweet by {} was not an image, tweet body: {}".format(target_tweet.user.screen_name, target_tweet.text))
 
 
+# Main function that will process the queue of tweets
+def process_queue():
+    while not tweet_queue.empty():
+        tweet_to_process = tweet_queue.get()
+        print("Processing tweet with ID {} by {}".format(tweet_to_process.id, tweet_to_process.user.screen_name))
+        process_tweet(tweet_to_process)
+    print("tweet_queue is empty, process_queue is exiting")
+
+
 class MyStreamListener(tweepy.StreamListener):
     def on_status(self, status):
         # print("[MyStreamListener.on_status]: {}".format(status))
         # print("Formatting as json: ")
         # print(json.dumps(status._json, sort_keys=True, indent=4, separators=(',', ': ')))
-        print("got tweet: {}".format(status.text))
-        process_tweet(status)
+        print("got tweet from {}: {}".format(status.user.screen_name, status.text))
+
+        # Add the tweet to the queue of tweets to be processed
+        tweet_queue.put(status)
+
+        # Check to see if there's already a thread that's processing tweets in the background
+        for thread in threading.enumerate():
+            # if there is a thread that's currently processing items
+            if thread.name.lower() == processing_thread_name:
+                # Return from the current function
+                print("Thread {} was found and so we are not creating a new one.".format(thread.name))
+                return
+
+        # Since we were unable to find the processing thread, we just start a new one
+        main_thread = threading.Thread(name=processing_thread_name, target=process_queue)
+        main_thread.daemon = True
+        main_thread.run()
 
     def on_error(self, status_code):
         if status_code == 420:
