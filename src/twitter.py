@@ -160,7 +160,7 @@ class MyStreamListener(tweepy.StreamListener):
 
         # Since we were unable to find the processing thread, we just start a new one
         main_thread = threading.Thread(name=processing_thread_name, target=process_queue)
-        main_thread.daemon = True
+        main_thread.daemon = True  # Enable the thread to run in the background as a daemon
         main_thread.run()
 
     def on_error(self, status_code):
